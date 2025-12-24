@@ -42,10 +42,6 @@ func runList(cmd *cobra.Command, args []string) {
 
 	steamID := viper.GetString("steamid64")
 	vanity := viper.GetString("vanity")
-	if steamID == "" && vanity == "" {
-		fmt.Fprintln(os.Stderr, "Error: --steamid64 or --vanity is required")
-		os.Exit(1)
-	}
 
 	ttl, _ := cmd.Flags().GetDuration("cache-ttl")
 	timeout, _ := cmd.Flags().GetDuration("timeout")
@@ -62,13 +58,10 @@ func runList(cmd *cobra.Command, args []string) {
 
 	ctx := context.Background()
 
-	if steamID == "" {
-		id, err := client.ResolveVanityURL(ctx, vanity)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error resolving vanity URL: %v\n", err)
-			os.Exit(1)
-		}
-		steamID = id
+	steamID, err = getSteamID(ctx, client, steamID, vanity)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
 	}
 
 	games, err := client.GetOwnedGames(ctx, steamID, includeFree)

@@ -36,20 +36,10 @@ var syncCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if syncSteamID == "" && syncVanity == "" {
-			fmt.Fprintln(os.Stderr, "Error: --steamid or --vanity is required")
+		syncSteamID, err = getSteamID(context.Background(), client, syncSteamID, syncVanity)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
-		}
-
-		if syncSteamID == "" {
-			fmt.Printf("Resolving vanity URL: %s\n", syncVanity)
-			id, err := client.ResolveVanityURL(context.Background(), syncVanity)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error resolving vanity URL: %v\n", err)
-				os.Exit(1)
-			}
-			syncSteamID = id
-			fmt.Printf("Resolved to SteamID: %s\n", syncSteamID)
 		}
 
 		database, err := db.New("steam-pick")
