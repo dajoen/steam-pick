@@ -8,6 +8,7 @@
 
 ## Done
 
+- [x] SP-016 Encrypt cache using OpenPGP
 - [x] SP-015 Cache vanity and api key
 - [x] SP-014 Implement pre-commit framework
 - [x] SP-013 Optimize sync and enrich commands for idempotency

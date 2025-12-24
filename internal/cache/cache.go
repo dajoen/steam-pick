@@ -1,9 +1,12 @@
 package cache
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -16,7 +19,9 @@ type Entry[T any] struct {
 
 // Cache manages storage of items in the filesystem.
 type Cache[T any] struct {
-	Dir string
+	Dir       string
+	Encrypted bool
+	GPGKey    string // GPG Key ID (email or hex ID)
 }
 
 // New creates a new Cache instance.
@@ -32,21 +37,53 @@ func New[T any](appName string) (*Cache[T], error) {
 	return &Cache[T]{Dir: dir}, nil
 }
 
+// WithEncryption enables GPG encryption for the cache.
+func (c *Cache[T]) WithEncryption(gpgKey string) *Cache[T] {
+	c.Encrypted = true
+	c.GPGKey = gpgKey
+	return c
+}
+
 // Get retrieves an item from the cache if it exists and is not expired.
 func (c *Cache[T]) Get(key string, ttl time.Duration) (*T, bool, error) {
-	path := filepath.Join(c.Dir, key+".json")
-	f, err := os.Open(path)
-	if os.IsNotExist(err) {
-		return nil, false, nil
+	ext := ".json"
+	if c.Encrypted {
+		ext = ".json.gpg"
 	}
-	if err != nil {
-		return nil, false, err
+	path := filepath.Join(c.Dir, key+ext)
+
+	var r io.Reader
+
+	if c.Encrypted {
+		// Decrypt using gpg
+		cmd := exec.Command("gpg", "--decrypt", "--quiet", path)
+		out, err := cmd.Output()
+		if err != nil {
+			if os.IsNotExist(err) {
+				return nil, false, nil
+			}
+			// If file exists but decryption fails (e.g. cancelled), treat as miss or error?
+			// Check if file exists first
+			if _, statErr := os.Stat(path); os.IsNotExist(statErr) {
+				return nil, false, nil
+			}
+			return nil, false, fmt.Errorf("gpg decryption failed: %w", err)
+		}
+		r = bytes.NewReader(out)
+	} else {
+		f, err := os.Open(path)
+		if os.IsNotExist(err) {
+			return nil, false, nil
+		}
+		if err != nil {
+			return nil, false, err
+		}
+		defer f.Close()
+		r = f
 	}
-	defer f.Close()
 
 	var entry Entry[T]
-	if err := json.NewDecoder(f).Decode(&entry); err != nil {
-		// If we can't decode it, treat it as a miss (and maybe it will be overwritten later)
+	if err := json.NewDecoder(r).Decode(&entry); err != nil {
 		return nil, false, nil
 	}
 
@@ -59,17 +96,40 @@ func (c *Cache[T]) Get(key string, ttl time.Duration) (*T, bool, error) {
 
 // Set writes an item to the cache.
 func (c *Cache[T]) Set(key string, data T) error {
-	path := filepath.Join(c.Dir, key+".json")
+	ext := ".json"
+	if c.Encrypted {
+		ext = ".json.gpg"
+	}
+	path := filepath.Join(c.Dir, key+ext)
+
 	entry := Entry[T]{
 		Timestamp: time.Now(),
 		Data:      data,
 	}
+
+	jsonData, err := json.Marshal(entry)
+	if err != nil {
+		return err
+	}
+
+	if c.Encrypted {
+		// Encrypt using gpg
+		args := []string{"--encrypt", "--recipient", c.GPGKey, "--output", path, "--yes"}
+		cmd := exec.Command("gpg", args...)
+		cmd.Stdin = bytes.NewReader(jsonData)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("gpg encryption failed: %s: %w", string(out), err)
+		}
+		return nil
+	}
+
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	return json.NewEncoder(f).Encode(entry)
+	_, err = f.Write(jsonData)
+	return err
 }
 
 // Clear removes the cache directory.

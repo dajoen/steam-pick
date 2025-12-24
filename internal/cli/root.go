@@ -39,10 +39,12 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Steam Web API Key")
 	rootCmd.PersistentFlags().StringVar(&gopassPath, "gopass-path", "", "Gopass path to Steam API Key (e.g. steam/api-key)")
 	rootCmd.PersistentFlags().Duration("auth-cache-ttl", 30*time.Minute, "Cache TTL for Vanity URL and API Key")
+	rootCmd.PersistentFlags().String("gpg-key", "", "GPG Key ID for cache encryption")
 
 	_ = viper.BindPFlag("api_key", rootCmd.PersistentFlags().Lookup("api-key"))
 	_ = viper.BindPFlag("gopass_path", rootCmd.PersistentFlags().Lookup("gopass-path"))
 	_ = viper.BindPFlag("auth_cache_ttl", rootCmd.PersistentFlags().Lookup("auth-cache-ttl"))
+	_ = viper.BindPFlag("gpg_key", rootCmd.PersistentFlags().Lookup("gpg-key"))
 }
 
 func initConfig() {
@@ -78,8 +80,12 @@ func getAPIKey() (string, error) {
 
 	// Try cache first
 	ttl := viper.GetDuration("auth_cache_ttl")
+	gpgKey := viper.GetString("gpg_key")
 	c, err := cache.New[string]("steam-pick")
 	if err == nil {
+		if gpgKey != "" {
+			c.WithEncryption(gpgKey)
+		}
 		if cached, found, _ := c.Get("gopass_key", ttl); found {
 			return *cached, nil
 		}

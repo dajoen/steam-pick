@@ -38,6 +38,11 @@ func TestCache(t *testing.T) {
 		t.Errorf("Get() value = %v, want %v", got.Value, data.Value)
 	}
 
+	// Test Encryption (if gpg is available)
+	// This is hard to test in CI without a GPG key.
+	// We can skip if GPG is not configured or mock the exec command (hard in Go without refactoring).
+	// For now, we assume manual verification or integration tests.
+
 	// Test Get Expired
 	// Manually modify timestamp to be old
 	// path := filepath.Join(c.Dir, key+".json")
