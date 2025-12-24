@@ -36,9 +36,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.steam-pick.yaml)")
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Steam Web API Key")
 	rootCmd.PersistentFlags().StringVar(&gopassPath, "gopass-path", "", "Gopass path to Steam API Key (e.g. steam/api-key)")
-	
-	viper.BindPFlag("api_key", rootCmd.PersistentFlags().Lookup("api-key"))
-	viper.BindPFlag("gopass_path", rootCmd.PersistentFlags().Lookup("gopass-path"))
+
+	_ = viper.BindPFlag("api_key", rootCmd.PersistentFlags().Lookup("api-key"))
+	_ = viper.BindPFlag("gopass_path", rootCmd.PersistentFlags().Lookup("gopass-path"))
 }
 
 func initConfig() {
@@ -62,6 +62,7 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err == nil {
 		// Config file found and read
+		_ = err
 	}
 }
 

@@ -31,25 +31,25 @@ func NewClient(timeout time.Duration) *Client {
 func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 	var resp *http.Response
 	var err error
-	
+
 	for i := 0; i <= maxRetries; i++ {
 		if i > 0 {
 			time.Sleep(time.Duration(i) * 500 * time.Millisecond)
 		}
-		
+
 		resp, err = c.httpClient.Do(req)
 		if err != nil {
 			continue
 		}
-		
+
 		if resp.StatusCode >= 500 {
 			resp.Body.Close()
 			continue
 		}
-		
+
 		return resp, nil
 	}
-	
+
 	return resp, err
 }
 

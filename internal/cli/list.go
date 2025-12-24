@@ -29,8 +29,8 @@ func init() {
 	listCmd.Flags().Duration("cache-ttl", 24*time.Hour, "Cache TTL")
 	listCmd.Flags().Duration("timeout", 15*time.Second, "HTTP Timeout")
 
-	viper.BindPFlag("steamid64", listCmd.Flags().Lookup("steamid64"))
-	viper.BindPFlag("vanity", listCmd.Flags().Lookup("vanity"))
+	_ = viper.BindPFlag("steamid64", listCmd.Flags().Lookup("steamid64"))
+	_ = viper.BindPFlag("vanity", listCmd.Flags().Lookup("vanity"))
 }
 
 func runList(cmd *cobra.Command, args []string) {
@@ -94,7 +94,10 @@ func runList(cmd *cobra.Command, args []string) {
 	if jsonOutput {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(unplayed)
+		if err := enc.Encode(unplayed); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON: %v\n", err)
+			os.Exit(1)
+		}
 	} else {
 		for _, g := range unplayed {
 			fmt.Printf("%d: %s\n", g.AppID, g.Name)

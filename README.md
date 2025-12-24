@@ -68,6 +68,43 @@ steam-pick cache
 steam-pick cache --clear
 ```
 
+## Advanced Features (Local LLM & Recommendations)
+
+### 1. Sync Library
+Fetch your games into a local SQLite database.
+This command compares your library with the database and only updates changed records.
+```bash
+steam-pick sync --steamid <your-steam-id>
+```
+
+### 2. Enrich Data
+Fetch store details (genres, descriptions) for your games.
+This command is idempotent and will skip games that already have details.
+Use `--refresh` to force an update of all games.
+```bash
+steam-pick enrich --workers 5
+steam-pick enrich --refresh # Force update all games
+```
+
+### 3. Build Taste Profile
+Analyze your playtime to understand your preferences.
+```bash
+steam-pick profile
+```
+
+### 4. Get Recommendations
+Get recommendations from your backlog based on your profile.
+```bash
+steam-pick recommend --top 5 --explain
+```
+
+### Local LLM Setup
+To use LLM features (explanation), you need a local LLM running (e.g. Ollama).
+```bash
+ollama run llama3
+steam-pick llm check --model llama3
+```
+
 ## Troubleshooting
 
 - **Empty List**: Ensure your Steam profile Game Details are set to **Public**.
@@ -94,6 +131,13 @@ make test
 make lint
 ```
 
+### CI Integration
+
+It is recommended to run the backlog linter in CI:
+```bash
+steam-pick backlog lint --fail-on error
+```
+
 ### Project Management
 
 This project uses [Backlog.md](https://github.com/MrLesk/Backlog.md) for task management.
@@ -108,3 +152,25 @@ To create a task:
 ```bash
 backlog task create "Task Title"
 ```
+
+## Development
+
+### Pre-commit Hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to ensure code quality.
+
+1. Install pre-commit:
+   ```bash
+   brew install pre-commit  # macOS
+   pip install pre-commit   # Cross-platform
+   ```
+
+2. Install the hooks:
+   ```bash
+   pre-commit install
+   ```
+
+3. Run hooks manually (optional):
+   ```bash
+   pre-commit run --all-files
+   ```

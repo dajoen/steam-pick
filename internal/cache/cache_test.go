@@ -41,17 +41,17 @@ func TestCache(t *testing.T) {
 	// Test Get Expired
 	// Manually modify timestamp to be old
 	// path := filepath.Join(c.Dir, key+".json")
-	// We can't easily modify the file content without re-writing it, 
+	// We can't easily modify the file content without re-writing it,
 	// but we can just wait if the TTL is small, or use a negative TTL for testing?
 	// No, Get checks time.Since(timestamp) > ttl.
 	// If we pass a negative TTL (or zero), it might not work as expected depending on logic.
 	// Let's just use a very short TTL and sleep.
-	
-	// Actually, let's just pass a 0 duration TTL, which means any existing file (created "now") 
+
+	// Actually, let's just pass a 0 duration TTL, which means any existing file (created "now")
 	// will have time.Since > 0.
 	// Wait, time.Since(now) is approx 0.
 	// If I pass 0 TTL, time.Since > 0 is likely true.
-	
+
 	// Let's sleep for 10ms and pass 1ns TTL.
 	time.Sleep(10 * time.Millisecond)
 	_, found, _ = c.Get(key, 1*time.Nanosecond)

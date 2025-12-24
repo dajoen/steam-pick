@@ -39,7 +39,7 @@ func (t *TestTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 func TestClient_ResolveVanityURL(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"response": {"steamid": "76561198000000000", "success": 1}}`))
+		_, _ = w.Write([]byte(`{"response": {"steamid": "76561198000000000", "success": 1}}`))
 	}))
 	defer ts.Close()
 
@@ -65,7 +65,7 @@ func TestClient_ResolveVanityURL(t *testing.T) {
 func TestClient_GetOwnedGames(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
+		_, _ = w.Write([]byte(`{
 			"response": {
 				"game_count": 1,
 				"games": [

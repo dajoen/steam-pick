@@ -12,8 +12,10 @@ import (
 	"github.com/dajoen/steam-pick/internal/model"
 )
 
+var ErrRateLimitExceeded = fmt.Errorf("rate limit exceeded")
+
 const (
-	baseURL = "https://api.steampowered.com"
+	baseURL    = "https://api.steampowered.com"
 	maxRetries = 2
 )
 
@@ -51,25 +53,30 @@ func NewClient(apiKey string, ttl time.Duration, timeout time.Duration) (*Client
 func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 	var resp *http.Response
 	var err error
-	
+
 	for i := 0; i <= maxRetries; i++ {
 		if i > 0 {
 			time.Sleep(time.Duration(i) * 500 * time.Millisecond)
 		}
-		
+
 		resp, err = c.httpClient.Do(req)
 		if err != nil {
 			continue
 		}
-		
+
 		if resp.StatusCode >= 500 {
 			resp.Body.Close()
 			continue
 		}
-		
+
+		if resp.StatusCode == 429 {
+			resp.Body.Close()
+			return nil, ErrRateLimitExceeded
+		}
+
 		return resp, nil
 	}
-	
+
 	return resp, err
 }
 
@@ -162,9 +169,40 @@ func (c *Client) GetOwnedGames(ctx context.Context, steamID64 string, includeFre
 		// This could be a private profile or just no games.
 		// We can't easily distinguish without another API call, but we should warn the user.
 		// For now, just return empty.
+		return nil, nil
 	}
 
 	_ = c.gamesCache.Set(cacheKey, result)
 
 	return result.Response.Games, nil
+}
+
+// GetAppDetails fetches store details for an app.
+func (c *Client) GetAppDetails(ctx context.Context, appID int) (*model.AppDetailsResponse, error) {
+	u, _ := url.Parse("https://store.steampowered.com/api/appdetails")
+	q := u.Query()
+	q.Set("appids", fmt.Sprintf("%d", appID))
+	u.RawQuery = q.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("steam store api returned status: %d", resp.StatusCode)
+	}
+
+	var result model.AppDetailsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

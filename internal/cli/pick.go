@@ -93,11 +93,11 @@ func runPick(cmd *cobra.Command, args []string) {
 
 	if turnBased {
 		storeClient := NewStoreClient(timeout)
-		
+
 		// Shuffle unplayed list to check random games
 		shuffled := make([]model.Game, len(unplayed))
 		copy(shuffled, unplayed)
-		
+
 		var src rand.Source
 		if seed != 0 {
 			src = rand.NewSource(seed)
@@ -105,7 +105,7 @@ func runPick(cmd *cobra.Command, args []string) {
 			src = rand.NewSource(time.Now().UnixNano())
 		}
 		r := rand.New(src)
-		
+
 		r.Shuffle(len(shuffled), func(i, j int) {
 			shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
 		})
@@ -115,18 +115,18 @@ func runPick(cmd *cobra.Command, args []string) {
 			if lookups >= maxLookups {
 				break
 			}
-			
+
 			isTurn, err := storeClient.IsTurnBased(ctx, shuffled[i].AppID, country)
 			if err == nil && isTurn {
 				picked = &shuffled[i]
 				picked.IsTurnBased = true
 				break
 			}
-			
+
 			lookups++
 			time.Sleep(sleep)
 		}
-		
+
 		if picked == nil {
 			fmt.Fprintln(os.Stderr, "No turn-based game found within limit, falling back to random unplayed game.")
 		}
@@ -147,7 +147,10 @@ func runPick(cmd *cobra.Command, args []string) {
 	if jsonOutput {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(picked)
+		if err := enc.Encode(picked); err != nil {
+			fmt.Fprintf(os.Stderr, "Error encoding JSON: %v\n", err)
+			os.Exit(1)
+		}
 	} else {
 		fmt.Printf("Name: %s\n", picked.Name)
 		fmt.Printf("AppID: %d\n", picked.AppID)
