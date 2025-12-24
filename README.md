@@ -93,3 +93,18 @@ make test
 ```bash
 make lint
 ```
+
+### Project Management
+
+This project uses [Backlog.md](https://github.com/MrLesk/Backlog.md) for task management.
+The backlog is stored in the `backlog/` directory.
+
+To view the board:
+```bash
+backlog board
+```
+
+To create a task:
+```bash
+backlog task create "Task Title"
+```
