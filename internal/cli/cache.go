@@ -21,7 +21,7 @@ func init() {
 
 func runCache(cmd *cobra.Command, args []string) {
 	// We can use any type for cache init since we just want to manage the dir
-	c, err := cache.New[any]("steam-unplayed")
+	c, err := cache.New[any]("steam-pick")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing cache: %v\n", err)
 		os.Exit(1)

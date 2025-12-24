@@ -1,4 +1,4 @@
-# steam-unplayed
+# steam-pick
 
 A production-grade CLI tool that recommends an unplayed Steam game (0 minutes) from your Steam library using the Steam Web API.
 
@@ -22,7 +22,7 @@ Download the latest release from the [Releases](https://github.com/jeroenverhoev
 ### From Source
 
 ```bash
-go install github.com/jeroenverhoeven/steam-pick/cmd/steam-unplayed@latest
+go install github.com/jeroenverhoeven/steam-pick/cmd/steam-pick@latest
 ```
 
 ## Usage
@@ -44,26 +44,26 @@ export STEAM_STEAMID64="your-steam-id" # Optional default
 #### List unplayed games
 
 ```bash
-steam-unplayed list --steamid64 <your-steam-id>
-steam-unplayed list --vanity <your-vanity-url-name>
-steam-unplayed list --include-free-games
+steam-pick list --steamid64 <your-steam-id>
+steam-pick list --vanity <your-vanity-url-name>
+steam-pick list --include-free-games
 # Using gopass
-steam-unplayed list --gopass-path steam/api-key --vanity <your-vanity-url-name>
+steam-pick list --gopass-path steam/api-key --vanity <your-vanity-url-name>
 ```
 
 #### Pick a random game
 
 ```bash
-steam-unplayed pick --steamid64 <your-steam-id>
-steam-unplayed pick --turn-based-only
-steam-unplayed pick --seed 12345 # Deterministic pick
+steam-pick pick --steamid64 <your-steam-id>
+steam-pick pick --turn-based-only
+steam-pick pick --seed 12345 # Deterministic pick
 ```
 
 #### Manage Cache
 
 ```bash
-steam-unplayed cache
-steam-unplayed cache --clear
+steam-pick cache
+steam-pick cache --clear
 ```
 
 ## Troubleshooting

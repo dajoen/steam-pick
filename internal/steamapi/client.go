@@ -28,11 +28,11 @@ type Client struct {
 
 // NewClient creates a new Steam API client.
 func NewClient(apiKey string, ttl time.Duration, timeout time.Duration) (*Client, error) {
-	gc, err := cache.New[model.SteamResponse]("steam-unplayed")
+	gc, err := cache.New[model.SteamResponse]("steam-pick")
 	if err != nil {
 		return nil, fmt.Errorf("failed to init games cache: %w", err)
 	}
-	vc, err := cache.New[model.VanityResponse]("steam-unplayed")
+	vc, err := cache.New[model.VanityResponse]("steam-pick")
 	if err != nil {
 		return nil, fmt.Errorf("failed to init vanity cache: %w", err)
 	}

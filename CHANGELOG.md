@@ -2,4 +2,4 @@
 
 ## [Unreleased]
 
-- Initial release of steam-unplayed.
+- Initial release of steam-pick.

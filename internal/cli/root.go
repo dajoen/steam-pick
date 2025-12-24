@@ -17,9 +17,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "steam-unplayed",
+	Use:   "steam-pick",
 	Short: "Recommend an unplayed Steam game from your library",
-	Long: `steam-unplayed is a CLI tool that helps you find games in your Steam library
+	Long: `steam-pick is a CLI tool that helps you find games in your Steam library
 that you haven't played yet (0 minutes playtime).`,
 }
 
@@ -33,7 +33,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.steam-unplayed.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.steam-pick.yaml)")
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Steam Web API Key")
 	rootCmd.PersistentFlags().StringVar(&gopassPath, "gopass-path", "", "Gopass path to Steam API Key (e.g. steam/api-key)")
 	
@@ -53,7 +53,7 @@ func initConfig() {
 
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".steam-unplayed")
+		viper.SetConfigName(".steam-pick")
 	}
 
 	viper.SetEnvPrefix("STEAM")

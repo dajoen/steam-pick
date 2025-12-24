@@ -1,6 +1,6 @@
 version: 2
 
-project_name: steam-unplayed
+project_name: steam-pick
 
 builds:
   - env:

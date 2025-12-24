@@ -1,8 +1,8 @@
 # Binaries
 /bin/
 /dist/
-steam-unplayed
-steam-unplayed.exe
+steam-pick
+steam-pick.exe
 
 # OS specific
 .DS_Store

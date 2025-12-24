@@ -11,7 +11,7 @@ type TestData struct {
 }
 
 func TestCache(t *testing.T) {
-	appName := "steam-unplayed-test"
+	appName := "steam-pick-test"
 	c, err := New[TestData](appName)
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
