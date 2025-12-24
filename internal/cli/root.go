@@ -5,7 +5,9 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
+	"github.com/dajoen/steam-pick/internal/cache"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -36,9 +38,11 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.steam-pick.yaml)")
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Steam Web API Key")
 	rootCmd.PersistentFlags().StringVar(&gopassPath, "gopass-path", "", "Gopass path to Steam API Key (e.g. steam/api-key)")
+	rootCmd.PersistentFlags().Duration("auth-cache-ttl", 30*time.Minute, "Cache TTL for Vanity URL and API Key")
 
 	_ = viper.BindPFlag("api_key", rootCmd.PersistentFlags().Lookup("api-key"))
 	_ = viper.BindPFlag("gopass_path", rootCmd.PersistentFlags().Lookup("gopass-path"))
+	_ = viper.BindPFlag("auth_cache_ttl", rootCmd.PersistentFlags().Lookup("auth-cache-ttl"))
 }
 
 func initConfig() {
@@ -74,6 +78,15 @@ func getAPIKey() (string, error) {
 
 	path := viper.GetString("gopass_path")
 	if path != "" {
+		// Try cache
+		ttl := viper.GetDuration("auth_cache_ttl")
+		c, err := cache.New[string]("steam-pick")
+		if err == nil {
+			if cached, found, _ := c.Get("gopass_key", ttl); found {
+				return *cached, nil
+			}
+		}
+
 		// Check if gopass is installed
 		if _, err := exec.LookPath("gopass"); err != nil {
 			return "", fmt.Errorf("gopass not found in PATH")
@@ -86,7 +99,14 @@ func getAPIKey() (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("failed to get key from gopass: %w", err)
 		}
-		return strings.TrimSpace(string(out)), nil
+		key := strings.TrimSpace(string(out))
+
+		// Save to cache
+		if c != nil {
+			_ = c.Set("gopass_key", key)
+		}
+
+		return key, nil
 	}
 
 	return "", fmt.Errorf("api key not found (use --api-key, STEAM_API_KEY, or --gopass-path)")

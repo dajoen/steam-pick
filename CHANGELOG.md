@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- SP-015 Cache vanity and api key
 - SP-014 Implement pre-commit framework
 - SP-013 Optimize sync and enrich commands for idempotency
 - SP-012 Respect API rate limits and handle 429 errors gracefully

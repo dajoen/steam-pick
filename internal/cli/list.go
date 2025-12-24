@@ -49,11 +49,12 @@ func runList(cmd *cobra.Command, args []string) {
 
 	ttl, _ := cmd.Flags().GetDuration("cache-ttl")
 	timeout, _ := cmd.Flags().GetDuration("timeout")
+	vanityTTL := viper.GetDuration("auth_cache_ttl")
 	includeFree, _ := cmd.Flags().GetBool("include-free-games")
 	limit, _ := cmd.Flags().GetInt("limit")
 	jsonOutput, _ := cmd.Flags().GetBool("json")
 
-	client, err := NewSteamClient(apiKey, ttl, timeout)
+	client, err := NewSteamClient(apiKey, ttl, vanityTTL, timeout)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing client: %v\n", err)
 		os.Exit(1)

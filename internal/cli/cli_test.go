@@ -29,7 +29,7 @@ func TestListCommand(t *testing.T) {
 	oldFactory := NewSteamClient
 	defer func() { NewSteamClient = oldFactory }()
 
-	NewSteamClient = func(apiKey string, ttl, timeout time.Duration) (SteamClient, error) {
+	NewSteamClient = func(apiKey string, ttl, vanityTTL, timeout time.Duration) (SteamClient, error) {
 		return &MockSteamClient{
 			Games: []model.Game{
 				{AppID: 1, Name: "Unplayed Game", PlaytimeForever: 0},

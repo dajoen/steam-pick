@@ -26,10 +26,11 @@ type Client struct {
 	gamesCache  *cache.Cache[model.SteamResponse]
 	vanityCache *cache.Cache[model.VanityResponse]
 	cacheTTL    time.Duration
+	vanityTTL   time.Duration
 }
 
 // NewClient creates a new Steam API client.
-func NewClient(apiKey string, ttl time.Duration, timeout time.Duration) (*Client, error) {
+func NewClient(apiKey string, ttl, vanityTTL, timeout time.Duration) (*Client, error) {
 	gc, err := cache.New[model.SteamResponse]("steam-pick")
 	if err != nil {
 		return nil, fmt.Errorf("failed to init games cache: %w", err)
@@ -47,6 +48,7 @@ func NewClient(apiKey string, ttl time.Duration, timeout time.Duration) (*Client
 		gamesCache:  gc,
 		vanityCache: vc,
 		cacheTTL:    ttl,
+		vanityTTL:   vanityTTL,
 	}, nil
 }
 
@@ -83,7 +85,7 @@ func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 // ResolveVanityURL resolves a vanity URL to a SteamID64.
 func (c *Client) ResolveVanityURL(ctx context.Context, vanityURL string) (string, error) {
 	cacheKey := "vanity_" + vanityURL
-	if cached, found, err := c.vanityCache.Get(cacheKey, c.cacheTTL); err == nil && found {
+	if cached, found, err := c.vanityCache.Get(cacheKey, c.vanityTTL); err == nil && found {
 		return cached.Response.SteamID, nil
 	}
 

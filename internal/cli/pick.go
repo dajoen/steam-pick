@@ -59,8 +59,9 @@ func runPick(cmd *cobra.Command, args []string) {
 	country, _ := cmd.Flags().GetString("country-code")
 	sleep, _ := cmd.Flags().GetDuration("sleep")
 	jsonOutput, _ := cmd.Flags().GetBool("json")
+	vanityTTL := viper.GetDuration("auth_cache_ttl")
 
-	client, err := NewSteamClient(apiKey, ttl, timeout)
+	client, err := NewSteamClient(apiKey, ttl, vanityTTL, timeout)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing client: %v\n", err)
 		os.Exit(1)

@@ -43,7 +43,7 @@ func TestClient_ResolveVanityURL(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	c, err := NewClient("test-key", time.Minute, time.Second)
+	c, err := NewClient("test-key", time.Minute, time.Minute, time.Second)
 	if err != nil {
 		t.Fatalf("NewClient error: %v", err)
 	}
@@ -81,7 +81,7 @@ func TestClient_GetOwnedGames(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	c, err := NewClient("test-key", time.Minute, time.Second)
+	c, err := NewClient("test-key", time.Minute, time.Minute, time.Second)
 	if err != nil {
 		t.Fatalf("NewClient error: %v", err)
 	}

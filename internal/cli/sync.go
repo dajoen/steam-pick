@@ -10,6 +10,7 @@ import (
 	"github.com/dajoen/steam-pick/internal/model"
 	"github.com/dajoen/steam-pick/internal/steamapi"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -28,7 +29,8 @@ var syncCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		client, err := steamapi.NewClient(apiKey, 24*time.Hour, 30*time.Second)
+		vanityTTL := viper.GetDuration("auth_cache_ttl")
+		client, err := steamapi.NewClient(apiKey, 24*time.Hour, vanityTTL, 30*time.Second)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)

@@ -21,15 +21,15 @@ type StoreClient interface {
 }
 
 // ClientFactoryFunc is a function that creates a SteamClient.
-type ClientFactoryFunc func(apiKey string, ttl, timeout time.Duration) (SteamClient, error)
+type ClientFactoryFunc func(apiKey string, ttl, vanityTTL, timeout time.Duration) (SteamClient, error)
 
 // StoreClientFactoryFunc is a function that creates a StoreClient.
 type StoreClientFactoryFunc func(timeout time.Duration) StoreClient
 
 // Default factories
 var (
-	NewSteamClient ClientFactoryFunc = func(apiKey string, ttl, timeout time.Duration) (SteamClient, error) {
-		return steamapi.NewClient(apiKey, ttl, timeout)
+	NewSteamClient ClientFactoryFunc = func(apiKey string, ttl, vanityTTL, timeout time.Duration) (SteamClient, error) {
+		return steamapi.NewClient(apiKey, ttl, vanityTTL, timeout)
 	}
 	NewStoreClient StoreClientFactoryFunc = func(timeout time.Duration) StoreClient {
 		return storeapi.NewClient(timeout)
