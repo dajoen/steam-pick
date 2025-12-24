@@ -78,9 +78,14 @@ func getAPIKey() (string, error) {
 			return "", fmt.Errorf("gopass not found in PATH")
 		}
 
-		out, err := exec.Command("gopass", "show", "-o", path).Output()
+		cmd := exec.Command("gopass", "show", "-o", path)
+		out, err := cmd.Output()
 		if err != nil {
-			return "", fmt.Errorf("failed to get key from gopass: %w", err)
+			var stderr string
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				stderr = string(exitErr.Stderr)
+			}
+			return "", fmt.Errorf("failed to get key from gopass: %w (stderr: %s)", err, stderr)
 		}
 		return strings.TrimSpace(string(out)), nil
 	}
