@@ -29,7 +29,10 @@ go install github.com/jeroenverhoeven/steam-pick/cmd/steam-unplayed@latest
 
 ### Configuration
 
-You can provide the API key via flag `--api-key` or environment variable `STEAM_API_KEY`.
+You can provide the API key via:
+- Flag `--api-key`
+- Environment variable `STEAM_API_KEY`
+- Gopass path via `--gopass-path` (e.g. `steam/api-key`)
 
 ```bash
 export STEAM_API_KEY="your-api-key"
@@ -44,6 +47,8 @@ export STEAM_STEAMID64="your-steam-id" # Optional default
 steam-unplayed list --steamid64 <your-steam-id>
 steam-unplayed list --vanity <your-vanity-url-name>
 steam-unplayed list --include-free-games
+# Using gopass
+steam-unplayed list --gopass-path steam/api-key --vanity <your-vanity-url-name>
 ```
 
 #### Pick a random game

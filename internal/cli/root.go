@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -10,8 +11,9 @@ import (
 )
 
 var (
-	cfgFile string
-	apiKey  string
+	cfgFile    string
+	apiKey     string
+	gopassPath string
 )
 
 var rootCmd = &cobra.Command{
@@ -33,8 +35,10 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.steam-unplayed.yaml)")
 	rootCmd.PersistentFlags().StringVar(&apiKey, "api-key", "", "Steam Web API Key")
+	rootCmd.PersistentFlags().StringVar(&gopassPath, "gopass-path", "", "Gopass path to Steam API Key (e.g. steam/api-key)")
 	
 	viper.BindPFlag("api_key", rootCmd.PersistentFlags().Lookup("api-key"))
+	viper.BindPFlag("gopass_path", rootCmd.PersistentFlags().Lookup("gopass-path"))
 }
 
 func initConfig() {
@@ -59,4 +63,27 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		// Config file found and read
 	}
+}
+
+func getAPIKey() (string, error) {
+	key := viper.GetString("api_key")
+	if key != "" {
+		return key, nil
+	}
+
+	path := viper.GetString("gopass_path")
+	if path != "" {
+		// Check if gopass is installed
+		if _, err := exec.LookPath("gopass"); err != nil {
+			return "", fmt.Errorf("gopass not found in PATH")
+		}
+
+		out, err := exec.Command("gopass", "show", "-o", path).Output()
+		if err != nil {
+			return "", fmt.Errorf("failed to get key from gopass: %w", err)
+		}
+		return strings.TrimSpace(string(out)), nil
+	}
+
+	return "", fmt.Errorf("api key not found (use --api-key, STEAM_API_KEY, or --gopass-path)")
 }

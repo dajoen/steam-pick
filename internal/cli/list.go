@@ -34,9 +34,9 @@ func init() {
 }
 
 func runList(cmd *cobra.Command, args []string) {
-	apiKey := viper.GetString("api_key")
-	if apiKey == "" {
-		fmt.Fprintln(os.Stderr, "Error: --api-key or STEAM_API_KEY is required")
+	apiKey, err := getAPIKey()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 
