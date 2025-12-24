@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- SP-017 Improve test coverage
 - SP-016 Encrypt cache using OpenPGP
 - SP-015 Cache vanity and api key
 - SP-014 Implement pre-commit framework

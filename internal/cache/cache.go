@@ -11,6 +11,24 @@ import (
 	"time"
 )
 
+// CommandRunner abstracts command execution for testing.
+type CommandRunner interface {
+	Run(name string, args ...string) ([]byte, error)
+	RunWithInput(name string, input []byte, args ...string) ([]byte, error)
+}
+
+type DefaultCommandRunner struct{}
+
+func (r *DefaultCommandRunner) Run(name string, args ...string) ([]byte, error) {
+	return exec.Command(name, args...).Output()
+}
+
+func (r *DefaultCommandRunner) RunWithInput(name string, input []byte, args ...string) ([]byte, error) {
+	cmd := exec.Command(name, args...)
+	cmd.Stdin = bytes.NewReader(input)
+	return cmd.CombinedOutput()
+}
+
 // Entry represents a cached item with a timestamp.
 type Entry[T any] struct {
 	Timestamp time.Time `json:"timestamp"`
@@ -22,6 +40,7 @@ type Cache[T any] struct {
 	Dir       string
 	Encrypted bool
 	GPGKey    string // GPG Key ID (email or hex ID)
+	Runner    CommandRunner
 }
 
 // New creates a new Cache instance.
@@ -34,7 +53,7 @@ func New[T any](appName string) (*Cache[T], error) {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create cache dir: %w", err)
 	}
-	return &Cache[T]{Dir: dir}, nil
+	return &Cache[T]{Dir: dir, Runner: &DefaultCommandRunner{}}, nil
 }
 
 // WithEncryption enables GPG encryption for the cache.
@@ -56,8 +75,7 @@ func (c *Cache[T]) Get(key string, ttl time.Duration) (*T, bool, error) {
 
 	if c.Encrypted {
 		// Decrypt using gpg
-		cmd := exec.Command("gpg", "--decrypt", "--quiet", path)
-		out, err := cmd.Output()
+		out, err := c.Runner.Run("gpg", "--decrypt", "--quiet", path)
 		if err != nil {
 			if os.IsNotExist(err) {
 				return nil, false, nil
@@ -115,9 +133,7 @@ func (c *Cache[T]) Set(key string, data T) error {
 	if c.Encrypted {
 		// Encrypt using gpg
 		args := []string{"--encrypt", "--recipient", c.GPGKey, "--output", path, "--yes"}
-		cmd := exec.Command("gpg", args...)
-		cmd.Stdin = bytes.NewReader(jsonData)
-		if out, err := cmd.CombinedOutput(); err != nil {
+		if out, err := c.Runner.RunWithInput("gpg", jsonData, args...); err != nil {
 			return fmt.Errorf("gpg encryption failed: %s: %w", string(out), err)
 		}
 		return nil

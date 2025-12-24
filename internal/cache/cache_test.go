@@ -38,25 +38,7 @@ func TestCache(t *testing.T) {
 		t.Errorf("Get() value = %v, want %v", got.Value, data.Value)
 	}
 
-	// Test Encryption (if gpg is available)
-	// This is hard to test in CI without a GPG key.
-	// We can skip if GPG is not configured or mock the exec command (hard in Go without refactoring).
-	// For now, we assume manual verification or integration tests.
-
 	// Test Get Expired
-	// Manually modify timestamp to be old
-	// path := filepath.Join(c.Dir, key+".json")
-	// We can't easily modify the file content without re-writing it,
-	// but we can just wait if the TTL is small, or use a negative TTL for testing?
-	// No, Get checks time.Since(timestamp) > ttl.
-	// If we pass a negative TTL (or zero), it might not work as expected depending on logic.
-	// Let's just use a very short TTL and sleep.
-
-	// Actually, let's just pass a 0 duration TTL, which means any existing file (created "now")
-	// will have time.Since > 0.
-	// Wait, time.Since(now) is approx 0.
-	// If I pass 0 TTL, time.Since > 0 is likely true.
-
 	// Let's sleep for 10ms and pass 1ns TTL.
 	time.Sleep(10 * time.Millisecond)
 	_, found, _ = c.Get(key, 1*time.Nanosecond)
@@ -89,5 +71,63 @@ func TestCache(t *testing.T) {
 	// Verify dir is gone
 	if _, err := os.Stat(c.Dir); !os.IsNotExist(err) {
 		t.Errorf("Clear() failed to remove dir")
+	}
+}
+
+type MockRunner struct {
+}
+
+func (m *MockRunner) Run(name string, args ...string) ([]byte, error) {
+	if name == "gpg" && args[0] == "--decrypt" {
+		// Find input path (last arg)
+		path := args[len(args)-1]
+		return os.ReadFile(path)
+	}
+	return nil, nil
+}
+
+func (m *MockRunner) RunWithInput(name string, input []byte, args ...string) ([]byte, error) {
+	if name == "gpg" && args[0] == "--encrypt" {
+		// Find output path
+		for i, arg := range args {
+			if arg == "--output" && i+1 < len(args) {
+				path := args[i+1]
+				// Write "encrypted" data (just the input for mock)
+				return nil, os.WriteFile(path, input, 0644)
+			}
+		}
+	}
+	return nil, nil
+}
+
+func TestCacheEncryption(t *testing.T) {
+	appName := "steam-pick-test-enc"
+	c, err := New[TestData](appName)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	defer os.RemoveAll(c.Dir)
+
+	c.WithEncryption("test-key")
+	c.Runner = &MockRunner{}
+
+	key := "test-key-enc"
+	data := TestData{Value: "secret"}
+
+	// Test Set
+	if err := c.Set(key, data); err != nil {
+		t.Errorf("Set() error = %v", err)
+	}
+
+	// Test Get Hit
+	got, found, err := c.Get(key, time.Minute)
+	if err != nil {
+		t.Errorf("Get() error = %v", err)
+	}
+	if !found {
+		t.Errorf("Get() found = false, want true")
+	}
+	if got.Value != data.Value {
+		t.Errorf("Get() value = %v, want %v", got.Value, data.Value)
 	}
 }

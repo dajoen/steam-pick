@@ -100,3 +100,48 @@ func TestClient_GetOwnedGames(t *testing.T) {
 		t.Errorf("got %s, want Counter-Strike", games[0].Name)
 	}
 }
+
+func TestClient_GetAppDetails(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/appdetails" {
+			t.Errorf("Expected path /api/appdetails, got %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{
+			"10": {
+				"success": true,
+				"data": {
+					"name": "Counter-Strike",
+					"short_description": "Action game"
+				}
+			}
+		}`))
+	}))
+	defer ts.Close()
+
+	c, err := NewClient("test-key", time.Minute, time.Minute, time.Second)
+	if err != nil {
+		t.Fatalf("NewClient error: %v", err)
+	}
+	// Clean up cache
+	defer os.RemoveAll(c.gamesCache.Dir)
+	defer os.RemoveAll(c.vanityCache.Dir)
+
+	c.httpClient.Transport = &TestTransport{TargetURL: ts.URL}
+
+	details, err := c.GetAppDetails(context.Background(), 10)
+	if err != nil {
+		t.Fatalf("GetAppDetails error: %v", err)
+	}
+
+	entry, ok := (*details)["10"]
+	if !ok {
+		t.Fatal("Expected details for app 10")
+	}
+	if !entry.Success {
+		t.Error("Expected success true")
+	}
+	if entry.Data.Name != "Counter-Strike" {
+		t.Errorf("Expected name Counter-Strike, got %s", entry.Data.Name)
+	}
+}

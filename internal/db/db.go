@@ -26,7 +26,11 @@ func New(appName string) (*DB, error) {
 	}
 
 	dbPath := filepath.Join(dir, "steampick.db")
-	db, err := sql.Open("sqlite3", dbPath)
+	return NewWithDSN(dbPath)
+}
+
+func NewWithDSN(dsn string) (*DB, error) {
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db: %w", err)
 	}
