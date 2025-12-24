@@ -76,17 +76,17 @@ func getAPIKey() (string, error) {
 		return key, nil
 	}
 
+	// Try cache first
+	ttl := viper.GetDuration("auth_cache_ttl")
+	c, err := cache.New[string]("steam-pick")
+	if err == nil {
+		if cached, found, _ := c.Get("gopass_key", ttl); found {
+			return *cached, nil
+		}
+	}
+
 	path := viper.GetString("gopass_path")
 	if path != "" {
-		// Try cache
-		ttl := viper.GetDuration("auth_cache_ttl")
-		c, err := cache.New[string]("steam-pick")
-		if err == nil {
-			if cached, found, _ := c.Get("gopass_key", ttl); found {
-				return *cached, nil
-			}
-		}
-
 		// Check if gopass is installed
 		if _, err := exec.LookPath("gopass"); err != nil {
 			return "", fmt.Errorf("gopass not found in PATH")
