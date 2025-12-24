@@ -1,0 +1,17 @@
+# Binaries
+/bin/
+/dist/
+steam-unplayed
+steam-unplayed.exe
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Test coverage
+coverage.out

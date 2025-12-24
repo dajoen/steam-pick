@@ -1,0 +1,26 @@
+.PHONY: all build test lint clean run release-dry
+
+BINARY_NAME=steam-unplayed
+BUILD_DIR=bin
+
+all: lint test build
+
+build:
+	mkdir -p $(BUILD_DIR)
+	go build -ldflags="-X 'github.com/jeroenverhoeven/steam-pick/internal/version.Version=$$(git describe --tags --always --dirty)' -X 'github.com/jeroenverhoeven/steam-pick/internal/version.Commit=$$(git rev-parse HEAD)' -X 'github.com/jeroenverhoeven/steam-pick/internal/version.Date=$$(date -u +%Y-%m-%dT%H:%M:%SZ)'" -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/steam-unplayed
+
+test:
+	go test -v -race -cover ./...
+
+lint:
+	golangci-lint run
+
+clean:
+	rm -rf $(BUILD_DIR)
+	rm -rf dist
+
+run: build
+	./$(BUILD_DIR)/$(BINARY_NAME)
+
+release-dry:
+	goreleaser release --snapshot --clean
