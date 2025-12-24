@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/jeroenverhoeven/steam-pick/internal/model"
+	"github.com/dajoen/steam-pick/internal/model"
 )
 
 // FilterUnplayed returns games with 0 playtime.

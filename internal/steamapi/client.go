@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/jeroenverhoeven/steam-pick/internal/cache"
-	"github.com/jeroenverhoeven/steam-pick/internal/model"
+	"github.com/dajoen/steam-pick/internal/cache"
+	"github.com/dajoen/steam-pick/internal/model"
 )
 
 const (

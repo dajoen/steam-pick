@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jeroenverhoeven/steam-pick/internal/model"
+	"github.com/dajoen/steam-pick/internal/model"
 )
 
 const maxRetries = 2

@@ -6,9 +6,8 @@ A production-grade CLI tool that recommends an unplayed Steam game (0 minutes) f
 
 - **List Unplayed Games**: Fetch and filter your library for games with 0 playtime.
 - **Pick a Game**: Randomly select a game to play, with optional "turn-based" filtering.
-- **Secure Secrets**: Native integration with `gopass` to securely retrieve your Steam API Key.
-- **Resilience**: Automatic retries with exponential backoff for transient API failures.
-- **Caching**: Caches API responses to avoid hitting rate limits and improve speed.
+- **Secure Configuration**: Retrieve your Steam API key securely from `gopass`.
+- **Resilient**: Built-in retries and caching to handle API flakiness and rate limits.
 - **Cross-Platform**: Single binary for Linux, macOS, and Windows.
 
 ## Prerequisites
@@ -31,15 +30,11 @@ go install github.com/dajoen/steam-pick/cmd/steam-pick@latest
 
 ### Configuration
 
-The tool looks for configuration in the following order (highest precedence first):
-1. Command-line flags (e.g., `--api-key`, `--gopass-path`)
-2. Environment variables (e.g., `STEAM_API_KEY`)
-3. Config file (`$HOME/.steam-pick.yaml`)
-
 You can provide the API key via:
-- **Flag**: `--api-key "..."`
-- **Env**: `export STEAM_API_KEY="..."`
-- **Gopass**: `--gopass-path "steam/api-key"` (supports interactive pinentry)
+- Flag `--api-key`
+- Environment variable `STEAM_API_KEY`
+- Gopass path via `--gopass-path` (e.g. `steam/api-key`)
+- Config file `$HOME/.steam-pick.yaml`
 
 ```bash
 export STEAM_API_KEY="your-api-key"

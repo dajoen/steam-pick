@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/jeroenverhoeven/steam-pick/internal/model"
-	"github.com/jeroenverhoeven/steam-pick/internal/steamapi"
-	"github.com/jeroenverhoeven/steam-pick/internal/storeapi"
+	"github.com/dajoen/steam-pick/internal/model"
+	"github.com/dajoen/steam-pick/internal/steamapi"
+	"github.com/dajoen/steam-pick/internal/storeapi"
 )
 
 // SteamClient defines the interface for Steam Web API interactions.

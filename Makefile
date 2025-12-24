@@ -7,7 +7,7 @@ all: lint test build
 
 build:
 	mkdir -p $(BUILD_DIR)
-	go build -ldflags="-X 'github.com/jeroenverhoeven/steam-pick/internal/version.Version=$$(git describe --tags --always --dirty)' -X 'github.com/jeroenverhoeven/steam-pick/internal/version.Commit=$$(git rev-parse HEAD)' -X 'github.com/jeroenverhoeven/steam-pick/internal/version.Date=$$(date -u +%Y-%m-%dT%H:%M:%SZ)'" -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/steam-pick
+	go build -ldflags="-X 'github.com/dajoen/steam-pick/internal/version.Version=$$(git describe --tags --always --dirty)' -X 'github.com/dajoen/steam-pick/internal/version.Commit=$$(git rev-parse HEAD)' -X 'github.com/dajoen/steam-pick/internal/version.Date=$$(date -u +%Y-%m-%dT%H:%M:%SZ)'" -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/steam-pick
 
 test:
 	go test -v -race -cover ./...

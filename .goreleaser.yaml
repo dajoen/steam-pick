@@ -14,9 +14,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/jeroenverhoeven/steam-pick/internal/version.Version={{.Version}}
-      - -X github.com/jeroenverhoeven/steam-pick/internal/version.Commit={{.Commit}}
-      - -X github.com/jeroenverhoeven/steam-pick/internal/version.Date={{.Date}}
+      - -X github.com/dajoen/steam-pick/internal/version.Version={{.Version}}
+      - -X github.com/dajoen/steam-pick/internal/version.Commit={{.Commit}}
+      - -X github.com/dajoen/steam-pick/internal/version.Date={{.Date}}
 
 archives:
   - format: tar.gz

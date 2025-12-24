@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/jeroenverhoeven/steam-pick/internal/logic"
-	"github.com/jeroenverhoeven/steam-pick/internal/model"
+	"github.com/dajoen/steam-pick/internal/logic"
+	"github.com/dajoen/steam-pick/internal/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

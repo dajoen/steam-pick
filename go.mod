@@ -1,4 +1,4 @@
-module github.com/jeroenverhoeven/steam-pick
+module github.com/dajoen/steam-pick
 
 go 1.23
 
