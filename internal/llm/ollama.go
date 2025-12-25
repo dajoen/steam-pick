@@ -33,7 +33,7 @@ func (c *OllamaClient) Check(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("ollama check failed: status %d", resp.StatusCode)
 	}
@@ -71,7 +71,7 @@ func (c *OllamaClient) Generate(ctx context.Context, prompt string) (string, err
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)
@@ -115,7 +115,7 @@ func (c *OllamaClient) Embed(ctx context.Context, text string) ([]float32, error
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(resp.Body)

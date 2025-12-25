@@ -76,7 +76,7 @@ func (d *DB) UpsertGames(games []model.Game) error {
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	for _, g := range games {
 		_, err := stmt.Exec(
@@ -97,7 +97,7 @@ func (d *DB) GetOwnedGames() ([]model.Game, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var games []model.Game
 	for rows.Next() {
@@ -120,7 +120,7 @@ func (d *DB) GetGamesMissingDetails() ([]model.Game, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var games []model.Game
 	for rows.Next() {
@@ -144,7 +144,7 @@ func (d *DB) GetGamesWithDetails() ([]model.GameDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var games []model.GameDetails
 	for rows.Next() {

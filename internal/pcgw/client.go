@@ -61,7 +61,7 @@ func (c *Client) GetAppDetails(ctx context.Context, appID int) (*model.AppDetail
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("pcgw api returned status: %d", resp.StatusCode)

@@ -15,7 +15,7 @@ func TestResolveVanityURL(t *testing.T) {
 		if r.URL.Path != "/ISteamUser/ResolveVanityURL/v1/" {
 			t.Errorf("Expected path /ISteamUser/ResolveVanityURL/v1/, got %s", r.URL.Path)
 		}
-		fmt.Fprintln(w, `{"response": {"steamid": "76561198000000000", "success": 1}}`)
+		_, _ = fmt.Fprintln(w, `{"response": {"steamid": "76561198000000000", "success": 1}}`)
 	}))
 	defer ts.Close()
 
@@ -48,7 +48,7 @@ func TestClient_ResolveVanityURL(t *testing.T) {
 		t.Fatalf("NewClient error: %v", err)
 	}
 	// Clean up cache
-	defer os.RemoveAll(c.gamesCache.DirPath())
+	defer func() { _ = os.RemoveAll(c.gamesCache.DirPath()) }()
 
 	// Inject test transport
 	c.httpClient.Transport = &TestTransport{TargetURL: ts.URL}
@@ -85,7 +85,7 @@ func TestClient_GetOwnedGames(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient error: %v", err)
 	}
-	defer os.RemoveAll(c.gamesCache.DirPath())
+	defer func() { _ = os.RemoveAll(c.gamesCache.DirPath()) }()
 
 	c.httpClient.Transport = &TestTransport{TargetURL: ts.URL}
 
@@ -124,8 +124,8 @@ func TestClient_GetAppDetails(t *testing.T) {
 		t.Fatalf("NewClient error: %v", err)
 	}
 	// Clean up cache
-	defer os.RemoveAll(c.gamesCache.Dir)
-	defer os.RemoveAll(c.vanityCache.Dir)
+	defer func() { _ = os.RemoveAll(c.gamesCache.Dir) }()
+	defer func() { _ = os.RemoveAll(c.vanityCache.Dir) }()
 
 	c.httpClient.Transport = &TestTransport{TargetURL: ts.URL}
 

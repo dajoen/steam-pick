@@ -43,7 +43,7 @@ func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		if resp.StatusCode >= 500 {
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			continue
 		}
 
@@ -71,7 +71,7 @@ func (c *Client) IsTurnBased(ctx context.Context, appID int, country string) (bo
 	if err != nil {
 		return false, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return false, fmt.Errorf("store api returned status: %d", resp.StatusCode)

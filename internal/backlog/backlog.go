@@ -35,7 +35,7 @@ func Parse(path string) (*Backlog, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	scanner := bufio.NewScanner(f)
 	backlog := &Backlog{}

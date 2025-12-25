@@ -100,7 +100,7 @@ func (c *Cache[T]) Get(key string, ttl time.Duration) (*T, bool, error) {
 		if err != nil {
 			return nil, false, err
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 		r = f
 	}
 
@@ -148,7 +148,7 @@ func (c *Cache[T]) Set(key string, data T) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	_, err = f.Write(jsonData)
 	return err
 }

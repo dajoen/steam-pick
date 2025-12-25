@@ -27,7 +27,7 @@ var profileCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		defer database.Close()
+		defer func() { _ = database.Close() }()
 
 		games, err := database.GetGamesWithDetails()
 		if err != nil {

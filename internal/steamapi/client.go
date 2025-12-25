@@ -67,12 +67,12 @@ func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 		}
 
 		if resp.StatusCode >= 500 {
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			continue
 		}
 
 		if resp.StatusCode == 429 {
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			return nil, ErrRateLimitExceeded
 		}
 
@@ -104,7 +104,7 @@ func (c *Client) ResolveVanityURL(ctx context.Context, vanityURL string) (string
 	if err != nil {
 		return "", fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("steam api returned status: %d", resp.StatusCode)
@@ -155,7 +155,7 @@ func (c *Client) GetOwnedGames(ctx context.Context, steamID64 string, includeFre
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("steam api returned status: %d", resp.StatusCode)
@@ -195,7 +195,7 @@ func (c *Client) GetAppDetails(ctx context.Context, appID int) (*model.AppDetail
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("steam store api returned status: %d", resp.StatusCode)

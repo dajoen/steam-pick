@@ -53,7 +53,7 @@ func TestListCommand(t *testing.T) {
 	listCmd.Run(listCmd, []string{})
 
 	// Restore stdout
-	w.Close()
+	_ = w.Close()
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer

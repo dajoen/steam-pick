@@ -47,7 +47,7 @@ var syncCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		defer database.Close()
+		defer func() { _ = database.Close() }()
 
 		fmt.Printf("Fetching games for SteamID: %s\n", syncSteamID)
 		games, err := client.GetOwnedGames(context.Background(), syncSteamID, syncIncludeFreeToPlay)

@@ -17,7 +17,7 @@ func TestNewWithDSN(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	// Verify that the tables were created
 	tables := []string{"owned_games", "app_details", "taste_profile"}
@@ -35,7 +35,7 @@ func TestUpsertGames(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	games := []model.Game{
 		{
@@ -90,7 +90,7 @@ func TestUpsertAppDetails(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	appID := 10
 	details := model.AppDetails{
@@ -136,7 +136,7 @@ func TestUpsertTasteProfile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	key := "user_123"
 	value := `{"likes": ["Action"], "dislikes": ["Strategy"]}`
@@ -168,7 +168,7 @@ func TestUniqueConstraint(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	games := []model.Game{
 		{AppID: 1, Name: "Game 1"},
@@ -201,7 +201,7 @@ func TestConcurrentAccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	done := make(chan bool)
 	go func() {
@@ -240,7 +240,7 @@ func TestGetGamesMissingDetails(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create DB: %v", err)
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }()
 
 	games := []model.Game{
 		{AppID: 1, Name: "Game 1"},

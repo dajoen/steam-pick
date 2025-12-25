@@ -16,7 +16,7 @@ func TestCache(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
-	defer os.RemoveAll(c.Dir)
+	defer func() { _ = os.RemoveAll(c.Dir) }()
 
 	key := "test-key"
 	data := TestData{Value: "hello"}
@@ -106,7 +106,7 @@ func TestCacheEncryption(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
-	defer os.RemoveAll(c.Dir)
+	defer func() { _ = os.RemoveAll(c.Dir) }()
 
 	c.WithEncryption("test-key")
 	c.Runner = &MockRunner{}
