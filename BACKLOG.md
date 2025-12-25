@@ -8,6 +8,7 @@
 
 ## Done
 
+- [x] SP-024 Add Copilot Instructions
 - [x] SP-023 Add pre-commit GitHub Action
 - [x] SP-022 Fix linter issues and update pre-commit
 - [x] SP-021 Implement offline list with sync interval
