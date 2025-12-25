@@ -1,6 +1,6 @@
 ---
-id: task-2
-title: Remove internal backlog command
+id: SP-020
+title: Implement login command
 status: Done
 assignee: []
 created_date: '2025-12-25 18:46'

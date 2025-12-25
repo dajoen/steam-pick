@@ -8,6 +8,11 @@
 
 ## Done
 
+- [x] SP-022 Fix linter issues and update pre-commit
+- [x] SP-021 Implement offline list with sync interval
+- [x] SP-020 Implement login command
+- [x] SP-019 Remove internal backlog command
+- [x] SP-018 Cache the vanity in db, and store gopass path if used
 - [x] SP-017 Improve test coverage
 - [x] SP-016 Encrypt cache using OpenPGP
 - [x] SP-015 Cache vanity and api key

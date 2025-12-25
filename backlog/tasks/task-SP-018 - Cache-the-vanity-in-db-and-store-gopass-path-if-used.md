@@ -1,5 +1,5 @@
 ---
-id: task-1
+id: SP-018
 title: 'Cache the vanity in db, and store gopass path if used'
 status: Done
 assignee: []
