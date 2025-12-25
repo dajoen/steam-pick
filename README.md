@@ -119,6 +119,14 @@ steam-pick llm check --model llama3
 make build
 ```
 
+If your CI uses a read-only or restricted home directory, set local Go cache paths:
+
+```bash
+export GOMODCACHE="$PWD/.gomodcache"
+export GOCACHE="$PWD/.gocache"
+make build
+```
+
 ### Test
 
 ```bash
