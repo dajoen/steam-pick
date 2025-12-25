@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -115,5 +116,19 @@ func getAPIKey() (string, error) {
 		return key, nil
 	}
 
-	return "", fmt.Errorf("api key not found (use --api-key, STEAM_API_KEY, or --gopass-path)")
+	// If interactive, try login
+	if isInteractive() {
+		fmt.Println("No API Key found. Starting login...")
+		if err := Login(context.Background()); err != nil {
+			return "", err
+		}
+		return viper.GetString("api_key"), nil
+	}
+
+	return "", fmt.Errorf("api key not found (use --api-key, STEAM_API_KEY, --gopass-path, or run 'steam-pick login')")
+}
+
+func isInteractive() bool {
+	fileInfo, _ := os.Stdin.Stat()
+	return (fileInfo.Mode() & os.ModeCharDevice) != 0
 }

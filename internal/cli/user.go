@@ -42,7 +42,12 @@ func getSteamID(ctx context.Context, client SteamClient, steamIDFlag, vanityFlag
 		}
 	}
 
-	return "", fmt.Errorf("--steamid64 or --vanity is required")
+	// 3. Check Config
+	if id := viper.GetString("steamid64"); id != "" {
+		return id, nil
+	}
+
+	return "", fmt.Errorf("--steamid64 or --vanity is required (or run 'steam-pick login')")
 }
 
 func saveUserCache(steamID, vanity string) error {
