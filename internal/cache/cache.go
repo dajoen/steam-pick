@@ -2,12 +2,15 @@ package cache
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -65,6 +68,7 @@ func (c *Cache[T]) WithEncryption(gpgKey string) *Cache[T] {
 
 // Get retrieves an item from the cache if it exists and is not expired.
 func (c *Cache[T]) Get(key string, ttl time.Duration) (*T, bool, error) {
+	key = safeKey(key)
 	ext := ".json"
 	if c.Encrypted {
 		ext = ".json.gpg"
@@ -114,6 +118,7 @@ func (c *Cache[T]) Get(key string, ttl time.Duration) (*T, bool, error) {
 
 // Set writes an item to the cache.
 func (c *Cache[T]) Set(key string, data T) error {
+	key = safeKey(key)
 	ext := ".json"
 	if c.Encrypted {
 		ext = ".json.gpg"
@@ -184,4 +189,35 @@ func (c *Cache[T]) Stats() (int, int64, error) {
 // DirPath returns the cache directory path.
 func (c *Cache[T]) DirPath() string {
 	return c.Dir
+}
+
+func safeKey(key string) string {
+	if isSafeKey(key) {
+		return key
+	}
+	sum := sha256.Sum256([]byte(key))
+	return "key_" + hex.EncodeToString(sum[:])
+}
+
+func isSafeKey(key string) bool {
+	if key == "" {
+		return false
+	}
+	if strings.ContainsAny(key, `/\`) {
+		return false
+	}
+	if strings.Contains(key, "..") {
+		return false
+	}
+	for _, r := range key {
+		switch {
+		case r >= 'a' && r <= 'z':
+		case r >= 'A' && r <= 'Z':
+		case r >= '0' && r <= '9':
+		case r == '.' || r == '_' || r == '-':
+		default:
+			return false
+		}
+	}
+	return true
 }
