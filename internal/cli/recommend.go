@@ -102,6 +102,10 @@ var recommendCmd = &cobra.Command{
 		})
 
 		// Top N
+		if recommendTop < 0 {
+			fmt.Fprintln(os.Stderr, "Error: --top must be >= 0")
+			os.Exit(1)
+		}
 		if len(recommendations) > recommendTop {
 			recommendations = recommendations[:recommendTop]
 		}

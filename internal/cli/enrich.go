@@ -33,6 +33,15 @@ var enrichCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if enrichRateLimit < 1 {
+			fmt.Fprintln(os.Stderr, "Error: --rate-limit-per-minute must be >= 1")
+			os.Exit(1)
+		}
+		if enrichWorkers < 1 {
+			fmt.Fprintln(os.Stderr, "Error: --workers must be >= 1")
+			os.Exit(1)
+		}
+
 		vanityTTL := viper.GetDuration("auth_cache_ttl")
 		client, err := steamapi.NewClient(apiKey, 24*time.Hour, vanityTTL, 30*time.Second)
 		if err != nil {
@@ -86,10 +95,11 @@ var enrichCmd = &cobra.Command{
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
+	loop:
 		for i, game := range gamesToEnrich {
 			select {
 			case <-ctx.Done():
-				break
+				break loop
 			default:
 			}
 

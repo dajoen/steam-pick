@@ -23,7 +23,12 @@ var lintCmd = &cobra.Command{
 	Use:   "lint",
 	Short: "Lint Backlog.md and CHANGELOG.md",
 	Run: func(cmd *cobra.Command, args []string) {
-		res, err := backlog.Lint("Backlog.md", "CHANGELOG.md")
+		backlogPath, err := resolveBacklogPath()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		res, err := backlog.Lint(backlogPath, "CHANGELOG.md")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
@@ -60,7 +65,12 @@ var backlogSyncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Sync completed backlog items to CHANGELOG.md",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := backlog.Sync("Backlog.md", "CHANGELOG.md", dryRun); err != nil {
+		backlogPath, err := resolveBacklogPath()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := backlog.Sync(backlogPath, "CHANGELOG.md", dryRun); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
@@ -76,4 +86,16 @@ func init() {
 	lintCmd.Flags().StringVar(&output, "output", "text", "Output format 'text' or 'json'")
 
 	backlogSyncCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Print changes without writing")
+}
+
+func resolveBacklogPath() (string, error) {
+	candidates := []string{"Backlog.md", "BACKLOG.md"}
+	for _, path := range candidates {
+		if _, err := os.Stat(path); err == nil {
+			return path, nil
+		} else if !os.IsNotExist(err) {
+			return "", err
+		}
+	}
+	return "", fmt.Errorf("backlog file not found (Backlog.md or BACKLOG.md)")
 }
