@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/dajoen/steam-pick/internal/model"
 	_ "github.com/mattn/go-sqlite3"
@@ -108,6 +109,15 @@ func (d *DB) GetOwnedGames() ([]model.Game, error) {
 		games = append(games, g)
 	}
 	return games, nil
+}
+
+func (d *DB) GetLastUpdate() (time.Time, error) {
+	var t time.Time
+	err := d.QueryRow("SELECT MAX(updated_at) FROM owned_games").Scan(&t)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return t, nil
 }
 
 func (d *DB) GetGamesMissingDetails() ([]model.Game, error) {
