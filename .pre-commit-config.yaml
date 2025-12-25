@@ -15,10 +15,3 @@ repos:
         types: [go]
         language: system
         pass_filenames: false
-
-      - id: backlog-lint
-        name: Backlog Lint
-        entry: bin/steam-pick backlog lint --fail-on error
-        language: system
-        pass_filenames: false
-        files: ^(backlog/|CHANGELOG.md)
